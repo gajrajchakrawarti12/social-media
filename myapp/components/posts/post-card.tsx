@@ -38,25 +38,27 @@ export function PostCard({ post }: PostCardProps) {
   }
 
   const handleDelete = async () => {
-    await deletePost(post.id)
+    if (post._id) {
+      await deletePost(post._id)
+    }
   }
 
   const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newComment.trim()) return
 
-    const success = await addComment(post.id, newComment)
+    const success = await addComment(post._id ?? "", newComment)
     if (success) {
       setNewComment("")
     }
   }
 
   const handleDeleteComment = async (commentId: string) => {
-    await deleteComment(post.id, commentId)
+    await deleteComment(post._id ?? "", commentId)
   }
 
-  const isOwnPost = user?.id === post.userId
-  const canDelete = isOwnPost && !post.id.startsWith("mock-")
+  const isOwnPost = user?._id === post.userId
+  const canDelete = isOwnPost && !post._id?.startsWith("mock-")
 
   return (
     <Card className="w-full hover:shadow-md transition-shadow">
@@ -66,7 +68,7 @@ export function PostCard({ post }: PostCardProps) {
             <img src={post.userAvatar || "/placeholder.svg"} alt={post.username} className="w-10 h-10 rounded-full" />
             <div>
               <p className="font-medium">@{post.username}</p>
-              <p className="text-sm text-muted-foreground">{formatDate(post.createdAt)}</p>
+              <p className="text-sm text-muted-foreground">{formatDate(post.createdAt ?? new Date())}</p>
             </div>
           </div>
 
@@ -103,11 +105,11 @@ export function PostCard({ post }: PostCardProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => likePost(post.id)}
+                onClick={() => likePost(post._id ?? "")}
                 className={`gap-2 ${post.isLiked ? "text-red-500 hover:text-red-600" : "text-muted-foreground"}`}
               >
                 <Heart className={`w-4 h-4 ${post.isLiked ? "fill-current" : ""}`} />
-                <span>{post.likes}</span>
+                <span>{post.likes.length ?? 0}</span>
               </Button>
 
               <Collapsible open={showComments} onOpenChange={setShowComments}>
@@ -131,21 +133,17 @@ export function PostCard({ post }: PostCardProps) {
               {post.comments.length > 0 && (
                 <div className="space-y-3 pt-2">
                   {post.comments.map((comment) => (
-                    <div key={comment.id} className="flex gap-3 p-3 bg-muted/30 rounded-lg">
-                      <img
-                        src={comment.userAvatar || "/placeholder.svg"}
-                        alt={comment.username}
-                        className="w-8 h-8 rounded-full"
-                      />
+                    <div key={comment._id} className="flex gap-3 p-3 bg-muted/30 rounded-lg">
+                      <img src={`${process.env.API_URL}/files/${comment.userAvatar}` || "/placeholder-user.jpg"} alt={comment.username} className="w-8 h-8 rounded-full" crossOrigin="anonymous" />
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <p className="font-medium text-sm">@{comment.username}</p>
                           <p className="text-xs text-muted-foreground">{formatDate(comment.createdAt)}</p>
-                          {user?.id === comment.userId && (
+                          {user?._id === comment.userId && (
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleDeleteComment(comment.id)}
+                              onClick={() => handleDeleteComment(comment._id ?? "")}
                               className="h-6 w-6 p-0 ml-auto"
                             >
                               <Trash2 className="w-3 h-3" />

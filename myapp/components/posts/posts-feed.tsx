@@ -11,7 +11,7 @@ export function PostsFeed() {
   const { posts } = usePosts()
   const { user } = useAuth()
 
-  const userPosts = posts.filter((post) => post.userId === user?.id)
+  const userPosts = posts.filter((post) => post.userId === user?._id)
   const isNewUser = userPosts.length === 0
 
   return (
@@ -55,7 +55,7 @@ export function PostsFeed() {
               <span>Latest from the community</span>
             </div>
             {posts.map((post) => (
-              <PostCard key={post.id} post={post} />
+              <PostCard key={post._id} post={post} />
             ))}
           </>
         )}

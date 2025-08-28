@@ -17,12 +17,24 @@ interface EditProfileFormProps {
 
 export function EditProfileForm({ onCancel, onSave }: EditProfileFormProps) {
   const { user, updateProfile, isLoading } = useAuth()
+
   const [formData, setFormData] = useState({
     username: user?.username || "",
     bio: user?.bio || "",
     avatar: user?.avatar || "",
   })
+
+  const [fileBlob, setFileBlob] = useState<File | null>(null)
   const [error, setError] = useState("")
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0]
+      setFileBlob(file)
+      setFormData({ ...formData, avatar: URL.createObjectURL(file) }) // instant preview
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -33,16 +45,51 @@ export function EditProfileForm({ onCancel, onSave }: EditProfileFormProps) {
       return
     }
 
-    const success = await updateProfile({
-      username: formData.username.trim(),
-      bio: formData.bio.trim(),
-      avatar: formData.avatar.trim() || `/placeholder.svg?height=120&width=120&query=user avatar`,
-    })
+    try {
+      // Upload new avatar if selected
+      if (fileBlob) {
+        setIsUploadingAvatar(true)
 
-    if (success) {
-      onSave()
-    } else {
-      setError("Failed to update profile. Please try again.")
+        // Delete old avatar if exists
+        if (user?.avatar) {
+          await fetch(`${process.env.NEXT_PUBLIC_API_URL}/files/deleteUserAvatar`, {
+            method: "DELETE",
+            credentials: "include",
+          })
+        }
+
+        const uploadFormData = new FormData()
+        uploadFormData.append("file", fileBlob, "avatar.jpg")
+        console.log(uploadFormData.get("file"));
+
+        const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/files/uploadUserAvatar`, {
+          method: "POST",
+          credentials: "include",
+          body: uploadFormData,
+        })
+
+        if (!uploadResponse.ok) {
+          throw new Error("Avatar upload failed")
+        }
+
+        setIsUploadingAvatar(false)
+      }
+
+      // Update profile details
+      const success = await updateProfile({
+        username: formData.username.trim(),
+        bio: formData.bio.trim(),
+      })
+
+      if (success) {
+        onSave()
+      } else {
+        setError("Failed to update profile. Please try again.")
+      }
+    } catch (err) {
+      console.error(err)
+      setError("Something went wrong. Please try again.")
+      setIsUploadingAvatar(false)
     }
   }
 
@@ -56,27 +103,30 @@ export function EditProfileForm({ onCancel, onSave }: EditProfileFormProps) {
           </Button>
         </CardTitle>
       </CardHeader>
+
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Avatar Preview */}
           <div className="text-center">
             <img
-              src={formData.avatar || `/placeholder.svg?height=120&width=120&query=user avatar`}
+              src={user?.avatar ? `${process.env.API_URL}/files/${user?.avatar}` : `/placeholder.svg?height=120&width=120&query=user avatar`}
               alt="Profile preview"
-              className="w-24 h-24 rounded-full mx-auto border-4 border-primary/20"
+              className="w-24 h-24 rounded-full mx-auto border-4 border-primary/20 object-cover"
             />
           </div>
 
+          {/* File Input */}
           <div className="space-y-2">
-            <Label htmlFor="avatar">Profile Picture URL</Label>
+            <Label htmlFor="file">Profile Picture</Label>
             <Input
-              id="avatar"
-              type="url"
-              placeholder="Enter image URL (optional)"
-              value={formData.avatar}
-              onChange={(e) => setFormData({ ...formData, avatar: e.target.value })}
+              id="file"
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
             />
           </div>
 
+          {/* Username */}
           <div className="space-y-2">
             <Label htmlFor="username">Username</Label>
             <Input
@@ -89,6 +139,7 @@ export function EditProfileForm({ onCancel, onSave }: EditProfileFormProps) {
             />
           </div>
 
+          {/* Bio */}
           <div className="space-y-2">
             <Label htmlFor="bio">Bio</Label>
             <Textarea
@@ -99,17 +150,26 @@ export function EditProfileForm({ onCancel, onSave }: EditProfileFormProps) {
               rows={4}
               maxLength={160}
             />
-            <p className="text-xs text-muted-foreground text-right">{formData.bio.length}/160 characters</p>
+            <p className="text-xs text-muted-foreground text-right">
+              {formData.bio.length}/160 characters
+            </p>
           </div>
 
+          {/* Error Message */}
           {error && <p className="text-sm text-destructive">{error}</p>}
 
+          {/* Buttons */}
           <div className="flex gap-3">
-            <Button type="submit" disabled={isLoading} className="flex-1">
+            <Button type="submit" disabled={isLoading || isUploadingAvatar} className="flex-1">
               <Save className="w-4 h-4 mr-2" />
-              {isLoading ? "Saving..." : "Save Changes"}
+              {isLoading || isUploadingAvatar ? "Saving..." : "Save Changes"}
             </Button>
-            <Button type="button" variant="outline" onClick={onCancel} className="flex-1 bg-transparent">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              className="flex-1 bg-transparent"
+            >
               Cancel
             </Button>
           </div>

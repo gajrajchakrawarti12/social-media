@@ -26,10 +26,10 @@ export function DiscoverPage() {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {users.map((userProfile) => (
-          <Card key={userProfile.id} className="hover:shadow-lg transition-shadow">
+          <Card key={userProfile._id} className="hover:shadow-lg transition-shadow">
             <CardHeader className="text-center pb-4">
               <img
-                src={userProfile.avatar || "/placeholder.svg"}
+                src={userProfile.avatar ? `${process.env.API_URL}/files/${userProfile.avatar}` : "/placeholder.svg"}
                 alt={userProfile.username}
                 className="w-16 h-16 rounded-full mx-auto mb-3"
               />
@@ -40,14 +40,14 @@ export function DiscoverPage() {
                     <Users className="w-3 h-3" />
                     <span>Followers</span>
                   </div>
-                  <p className="font-semibold">{userProfile.followers.toLocaleString()}</p>
+                  <p className="font-semibold">{userProfile.followers}</p>
                 </div>
                 <div className="text-center">
                   <div className="flex items-center gap-1 text-sm text-muted-foreground">
                     <TrendingUp className="w-3 h-3" />
                     <span>Following</span>
                   </div>
-                  <p className="font-semibold">{userProfile.following.toLocaleString()}</p>
+                  <p className="font-semibold">{userProfile.following}</p>
                 </div>
               </div>
             </CardHeader>
@@ -61,11 +61,11 @@ export function DiscoverPage() {
               </div>
 
               <Button
-                onClick={() => handleFollowToggle(userProfile.id, userProfile.isFollowing)}
-                variant={userProfile.isFollowing ? "outline" : "default"}
+                onClick={() => handleFollowToggle(userProfile._id, !!userProfile.isFollowing)}
+                variant={userProfile?.isFollowing ? "outline" : "default"}
                 className="w-full"
               >
-                {userProfile.isFollowing ? (
+                {userProfile?.isFollowing ? (
                   <>
                     <UserMinus className="w-4 h-4 mr-2" />
                     Unfollow

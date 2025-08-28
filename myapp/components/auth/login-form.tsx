@@ -14,7 +14,7 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ onToggleMode }: LoginFormProps) {
-  const [email, setEmail] = useState("")
+  const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const { login, isLoading } = useAuth()
@@ -23,7 +23,7 @@ export function LoginForm({ onToggleMode }: LoginFormProps) {
     e.preventDefault()
     setError("")
 
-    const success = await login(email, password)
+    const success = await login(username, password)
     if (!success) {
       setError("Invalid credentials. Please try again.")
     }
@@ -38,13 +38,13 @@ export function LoginForm({ onToggleMode }: LoginFormProps) {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="username">Username</Label>
             <Input
-              id="email"
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              id="username"
+              type="text"
+              placeholder="Enter your username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               required
             />
           </div>

@@ -5,7 +5,7 @@ import { createContext, useContext, useState, useEffect } from "react"
 import { useAuth } from "./auth-context"
 
 export interface Comment {
-  id: string
+  _id: string
   postId: string
   userId: string
   username: string
@@ -13,18 +13,22 @@ export interface Comment {
   content: string
   createdAt: Date
 }
-
-export interface Post {
-  id: string
+export interface Like {
+  _id: string
   userId: string
-  username: string
-  userAvatar: string
+  createdAt: Date
+}
+export interface Post {
+  _id?: string
+  userId: string
+  username?: string
+  userAvatar?: string
   content: string
   image?: string
-  createdAt: Date
-  likes: number
+  createdAt?: Date
+  likes: Like[]
   comments: Comment[]
-  isLiked: boolean
+  isLiked?: boolean
 }
 
 interface PostsContextType {
@@ -39,124 +43,29 @@ interface PostsContextType {
 
 const PostsContext = createContext<PostsContextType | undefined>(undefined)
 
-const mockComments: Comment[] = [
-  {
-    id: "comment-1",
-    postId: "mock-1",
-    userId: "user-3",
-    username: "alex_designer",
-    userAvatar: `/placeholder.svg?height=32&width=32&query=designer avatar`,
-    content: "Congratulations! Your first app looks amazing! 🎉",
-    createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000),
-  },
-  {
-    id: "comment-2",
-    postId: "mock-1",
-    userId: "user-4",
-    username: "mike_startup",
-    userAvatar: `/placeholder.svg?height=32&width=32&query=entrepreneur avatar`,
-    content: "The journey of a thousand apps begins with a single component. Well done!",
-    createdAt: new Date(Date.now() - 30 * 60 * 1000),
-  },
-  {
-    id: "comment-3",
-    postId: "mock-2",
-    userId: "user-2",
-    username: "sarah_dev",
-    userAvatar: `/placeholder.svg?height=32&width=32&query=woman developer avatar`,
-    content: "Love the clean aesthetic! The color palette is perfect.",
-    createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000),
-  },
-  {
-    id: "comment-4",
-    postId: "mock-3",
-    userId: "user-5",
-    username: "emma_tech",
-    userAvatar: `/placeholder.svg?height=32&width=32&query=tech woman avatar`,
-    content: "Coffee shops are the best! I do my most creative work there too ☕",
-    createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000),
-  },
-]
-
-const mockPosts: Post[] = [
-  {
-    id: "mock-1",
-    userId: "user-2",
-    username: "sarah_dev",
-    userAvatar: `/placeholder.svg?height=40&width=40&query=woman developer avatar`,
-    content:
-      "Just launched my first React app! The feeling of seeing your code come to life is incredible. Thanks to everyone who helped me along the way! 🚀",
-    createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
-    likes: 24,
-    comments: mockComments.filter((c) => c.postId === "mock-1"),
-    isLiked: false,
-  },
-  {
-    id: "mock-2",
-    userId: "user-3",
-    username: "alex_designer",
-    userAvatar: `/placeholder.svg?height=40&width=40&query=designer avatar`,
-    content:
-      "Working on some new UI concepts for mobile apps. Clean design is not just about aesthetics, it's about creating intuitive user experiences.",
-    image: `/placeholder.svg?height=300&width=500&query=modern mobile app design mockup`,
-    createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000),
-    likes: 42,
-    comments: mockComments.filter((c) => c.postId === "mock-2"),
-    isLiked: true,
-  },
-  {
-    id: "mock-3",
-    userId: "user-4",
-    username: "mike_startup",
-    userAvatar: `/placeholder.svg?height=40&width=40&query=entrepreneur avatar`,
-    content:
-      "Coffee shop coding session today. Sometimes the best ideas come when you step away from your usual workspace. What's your favorite place to work?",
-    image: `/placeholder.svg?height=300&width=500&query=coffee shop laptop coding`,
-    createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000),
-    likes: 18,
-    comments: mockComments.filter((c) => c.postId === "mock-3"),
-    isLiked: false,
-  },
-  {
-    id: "mock-4",
-    userId: "user-5",
-    username: "emma_tech",
-    userAvatar: `/placeholder.svg?height=40&width=40&query=tech woman avatar`,
-    content:
-      "Reminder: Your code doesn't have to be perfect on the first try. Progress over perfection, always. Keep building, keep learning! 💪",
-    createdAt: new Date(Date.now() - 8 * 60 * 60 * 1000),
-    likes: 67,
-    comments: [],
-    isLiked: false,
-  },
-  {
-    id: "mock-5",
-    userId: "user-6",
-    username: "david_ai",
-    userAvatar: `/placeholder.svg?height=40&width=40&query=ai researcher avatar`,
-    content:
-      "Fascinating discussion at today's AI meetup about the future of human-computer interaction. The possibilities are endless when we combine creativity with technology.",
-    createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000),
-    likes: 35,
-    comments: [],
-    isLiked: true,
-  },
-]
-
 export function PostsProvider({ children }: { children: React.ReactNode }) {
   const [posts, setPosts] = useState<Post[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const { user } = useAuth()
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"
 
   useEffect(() => {
-    // Load posts from localStorage on mount
-    const storedPosts = localStorage.getItem("social-media-posts")
-    let userPosts: Post[] = []
+    // Load posts from API on mount
+    const fetchPosts = async () => {
+      const response = await fetch(`${API_URL}/posts`, {
+        method: "GET",
+        credentials: "include"
+      });
+      const data = await response.json();
+      console.log(data);
+      let userPosts: Post[] = [];
 
-    if (storedPosts) {
-      userPosts = JSON.parse(storedPosts).map((post: any) => ({
-        ...post,
+      if (data) {
+        userPosts = data.map((post: any) => ({
+          ...post,
         createdAt: new Date(post.createdAt),
+        username: post.userId.username,
+        userAvatar: post.userId.avatar || `/placeholder-user.jpg?height=32&width=32&query=user avatar`,
         comments:
           post.comments?.map((comment: any) => ({
             ...comment,
@@ -165,20 +74,28 @@ export function PostsProvider({ children }: { children: React.ReactNode }) {
       }))
     }
 
-    const allPosts = [...userPosts, ...mockPosts].sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    const allPosts = [...userPosts].sort(
+      (a, b) => new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime(),
     )
     setPosts(allPosts)
+    }
+
+    fetchPosts()
   }, [])
 
-  const savePosts = (newPosts: Post[]) => {
-    const userPosts = newPosts.filter((post) => !post.id.startsWith("mock-"))
-    localStorage.setItem("social-media-posts", JSON.stringify(userPosts))
+  const savePosts = async (newPosts: Post) => {
+    console.log(newPosts);
 
-    const allPosts = [...newPosts.filter((post) => !post.id.startsWith("mock-")), ...mockPosts].sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    )
-    setPosts(allPosts)
+    const response = await fetch(`${API_URL}/posts`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(newPosts),
+    })
+    const userPosts = await response.json()
+    setPosts([userPosts, ...posts])
   }
 
   const createPost = async (content: string, image?: string): Promise<boolean> => {
@@ -188,21 +105,13 @@ export function PostsProvider({ children }: { children: React.ReactNode }) {
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
     const newPost: Post = {
-      id: Date.now().toString(),
-      userId: user.id,
-      username: user.username,
-      userAvatar: user.avatar || `/placeholder.svg?height=40&width=40&query=user avatar`,
+      userId: user._id,
       content: content.trim(),
       image,
-      createdAt: new Date(),
-      likes: 0,
+      likes: [],
       comments: [],
-      isLiked: false,
     }
-
-    const currentUserPosts = posts.filter((post) => !post.id.startsWith("mock-"))
-    const updatedPosts = [newPost, ...currentUserPosts]
-    savePosts(updatedPosts)
+    savePosts(newPost)
 
     setIsLoading(false)
     return true
@@ -214,8 +123,8 @@ export function PostsProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true)
     await new Promise((resolve) => setTimeout(resolve, 500))
 
-    const updatedPosts = posts.filter((post) => !(post.id === postId && post.userId === user.id))
-    savePosts(updatedPosts.filter((post) => !post.id.startsWith("mock-")))
+    const updatedPosts = posts.filter((post) => !(post._id === postId && post.userId === user._id ))
+    setPosts(updatedPosts)
 
     setIsLoading(false)
     return true
@@ -223,18 +132,20 @@ export function PostsProvider({ children }: { children: React.ReactNode }) {
 
   const likePost = (postId: string) => {
     const updatedPosts = posts.map((post) => {
-      if (post.id === postId) {
+      if (post._id === postId) {
         return {
           ...post,
           isLiked: !post.isLiked,
-          likes: post.isLiked ? post.likes - 1 : post.likes + 1,
+          likes: post.isLiked
+            ? post.likes.slice(0, post.likes.length - 1)
+            : [...post.likes, { _id: `${user?._id}-${postId}`, userId: user?._id ?? '', createdAt: new Date() }],
         }
       }
       return post
     })
     setPosts(updatedPosts)
 
-    const userPosts = updatedPosts.filter((post) => !post.id.startsWith("mock-"))
+    const userPosts = updatedPosts.filter((post) => !(post._id && post._id.startsWith("mock-")))
     if (userPosts.length > 0) {
       localStorage.setItem("social-media-posts", JSON.stringify(userPosts))
     }
@@ -247,9 +158,9 @@ export function PostsProvider({ children }: { children: React.ReactNode }) {
     await new Promise((resolve) => setTimeout(resolve, 500))
 
     const newComment: Comment = {
-      id: `comment-${Date.now()}`,
+      _id: `comment-${Date.now()}`,
       postId,
-      userId: user.id,
+      userId: user._id,
       username: user.username,
       userAvatar: user.avatar || `/placeholder.svg?height=32&width=32&query=user avatar`,
       content: content.trim(),
@@ -257,7 +168,7 @@ export function PostsProvider({ children }: { children: React.ReactNode }) {
     }
 
     const updatedPosts = posts.map((post) => {
-      if (post.id === postId) {
+      if (post._id === postId) {
         return {
           ...post,
           comments: [...post.comments, newComment],
@@ -267,7 +178,7 @@ export function PostsProvider({ children }: { children: React.ReactNode }) {
     })
 
     setPosts(updatedPosts)
-    const userPosts = updatedPosts.filter((post) => !post.id.startsWith("mock-"))
+    const userPosts = updatedPosts.filter((post) => !(post._id && post._id.startsWith("mock-")))
     if (userPosts.length > 0) {
       localStorage.setItem("social-media-posts", JSON.stringify(userPosts))
     }
@@ -283,17 +194,17 @@ export function PostsProvider({ children }: { children: React.ReactNode }) {
     await new Promise((resolve) => setTimeout(resolve, 500))
 
     const updatedPosts = posts.map((post) => {
-      if (post.id === postId) {
+      if (post._id === postId) {
         return {
           ...post,
-          comments: post.comments.filter((comment) => !(comment.id === commentId && comment.userId === user.id)),
+          comments: post.comments.filter((comment) => !(comment._id === commentId && comment.userId === user._id)),
         }
       }
       return post
     })
 
     setPosts(updatedPosts)
-    const userPosts = updatedPosts.filter((post) => !post.id.startsWith("mock-"))
+    const userPosts = updatedPosts.filter((post) => !(post._id && post._id.startsWith("mock-")))
     if (userPosts.length > 0) {
       localStorage.setItem("social-media-posts", JSON.stringify(userPosts))
     }

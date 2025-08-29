@@ -14,7 +14,7 @@ export function CreatePostForm() {
   const { user } = useAuth()
   const { createPost, isLoading } = usePosts()
   const [content, setContent] = useState("")
-  const [image, setImage] = useState("")
+  const [image, setImage] = useState<Blob | null>(null)
   const [showImageInput, setShowImageInput] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -24,15 +24,16 @@ export function CreatePostForm() {
     const success = await createPost(content, image || undefined)
     if (success) {
       setContent("")
-      setImage("")
+      setImage(null)
       setShowImageInput(false)
+      window.location.reload() // Refresh to show the new post
     }
   }
 
   const handleImageToggle = () => {
     setShowImageInput(!showImageInput)
     if (showImageInput) {
-      setImage("")
+      setImage(null)
     }
   }
 
@@ -42,7 +43,7 @@ export function CreatePostForm() {
     <Card className="w-full">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-3">
-          <img src={`${process.env.API_URL}/files/${user.avatar}` || "/placeholder-user.jpg"} alt={user.username} className="w-8 h-8 rounded-full" crossOrigin="anonymous" />
+          <img src={user.avatar ? `${process.env.API_URL}/files/${user.avatar}` : "/placeholder-user.jpg"} alt={user.username} className="w-8 h-8 rounded-full" crossOrigin="anonymous" />
           <div>
             <p className="font-medium">@{user.username}</p>
             <p className="text-sm text-muted-foreground">Share your thoughts...</p>
@@ -64,10 +65,14 @@ export function CreatePostForm() {
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <Input
-                  type="url"
-                  placeholder="Enter image URL..."
-                  value={image}
-                  onChange={(e) => setImage(e.target.value)}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setImage(file);
+                    }
+                  }}
                   className="flex-1"
                 />
                 <Button type="button" variant="ghost" size="sm" onClick={handleImageToggle}>
@@ -77,7 +82,7 @@ export function CreatePostForm() {
               {image && (
                 <div className="relative">
                   <img
-                    src={image || "/placeholder.svg"}
+                    src={URL.createObjectURL(image)}
                     alt="Preview"
                     className="w-full max-h-64 object-cover rounded-lg"
                   />

@@ -32,6 +32,7 @@ export function DiscoverPage() {
                 src={userProfile.avatar ? `${process.env.API_URL}/files/${userProfile.avatar}` : "/placeholder.svg"}
                 alt={userProfile.username}
                 className="w-16 h-16 rounded-full mx-auto mb-3"
+                crossOrigin="anonymous"
               />
               <CardTitle className="text-lg">@{userProfile.username}</CardTitle>
               <div className="flex justify-center gap-4 mt-2">

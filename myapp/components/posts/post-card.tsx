@@ -57,7 +57,8 @@ export function PostCard({ post }: PostCardProps) {
     await deleteComment(post._id ?? "", commentId)
   }
 
-  const isOwnPost = user?._id === post.userId
+  const isOwnPost =
+    typeof post.userId === "object" && user?._id === post.userId._id
   const canDelete = isOwnPost && !post._id?.startsWith("mock-")
 
   return (
@@ -65,7 +66,7 @@ export function PostCard({ post }: PostCardProps) {
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <img src={post.userAvatar || "/placeholder.svg"} alt={post.username} className="w-10 h-10 rounded-full" />
+            <img src={post.userAvatar || "/placeholder.svg"} alt={post.username} className="w-10 h-10 rounded-full"  crossOrigin="anonymous"/>
             <div>
               <p className="font-medium">@{post.username}</p>
               <p className="text-sm text-muted-foreground">{formatDate(post.createdAt ?? new Date())}</p>
@@ -96,7 +97,7 @@ export function PostCard({ post }: PostCardProps) {
 
           {post.image && (
             <div className="rounded-lg overflow-hidden">
-              <img src={post.image || "/placeholder.svg"} alt="Post image" className="w-full max-h-96 object-cover" />
+              <img src={post.image ? `${process.env.API_URL}/files/${post.image}` : "/placeholder.svg"} crossOrigin="anonymous" alt="Post image" className="w-full max-h-96 object-cover" />
             </div>
           )}
 
@@ -134,10 +135,10 @@ export function PostCard({ post }: PostCardProps) {
                 <div className="space-y-3 pt-2">
                   {post.comments.map((comment) => (
                     <div key={comment._id} className="flex gap-3 p-3 bg-muted/30 rounded-lg">
-                      <img src={`${process.env.API_URL}/files/${comment.userAvatar}` || "/placeholder-user.jpg"} alt={comment.username} className="w-8 h-8 rounded-full" crossOrigin="anonymous" />
+                      <img src={comment.userId instanceof Object && comment.userId.avatar ? `${process.env.API_URL}/files/${comment.userId.avatar}` :  "/placeholder-user.jpg"} alt={comment.userId instanceof Object ? comment.userId.username : ""} className="w-8 h-8 rounded-full" crossOrigin="anonymous" />
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <p className="font-medium text-sm">@{comment.username}</p>
+                          <p className="font-medium text-sm">@{comment.userId instanceof Object ? comment.userId.username : ""}</p>
                           <p className="text-xs text-muted-foreground">{formatDate(comment.createdAt)}</p>
                           {user?._id === comment.userId && (
                             <Button
@@ -158,7 +159,7 @@ export function PostCard({ post }: PostCardProps) {
               )}
 
               <form onSubmit={handleAddComment} className="flex gap-2">
-                <img src={user?.avatar || "/placeholder.svg"} alt="Your avatar" className="w-8 h-8 rounded-full" />
+                <img src={user?.avatar ? `${process.env.API_URL}/files/${user.avatar}` : "/placeholder-user.jpg"} alt="Your avatar" className="w-8 h-8 rounded-full" crossOrigin="anonymous" />
                 <div className="flex-1 flex gap-2">
                   <Input
                     placeholder="Write a comment..."

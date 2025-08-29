@@ -42,7 +42,6 @@ export function SocialProvider({ children }: { children: React.ReactNode }) {
           credentials: "include"
         });
         const followingData = await res.json();
-        console.log(followingData);
         if (result.users)
           setUsers(() => {
             return result.users

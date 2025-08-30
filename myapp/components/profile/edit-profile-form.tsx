@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/contexts/auth-context"
 import { Save, X } from "lucide-react"
-import { FILE_URL } from "@/app/page"
+import { FILE_URL } from "@/app/file"
 
 interface EditProfileFormProps {
   onCancel: () => void

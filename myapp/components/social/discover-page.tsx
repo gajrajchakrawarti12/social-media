@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useSocial } from "@/contexts/social-context"
 import { UserPlus, UserMinus, Users, TrendingUp } from "lucide-react"
-import { FILE_URL } from "@/app/page"
+import { FILE_URL } from "@/app/file"
 
 export function DiscoverPage() {
   const { users, followUser, unfollowUser } = useSocial()

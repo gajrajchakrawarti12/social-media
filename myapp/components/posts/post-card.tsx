@@ -11,7 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { usePosts, type Post } from "@/contexts/posts-context"
 import { useAuth } from "@/contexts/auth-context"
-import { FILE_URL } from "@/app/page"
+import { FILE_URL } from "@/app/file"
 
 interface PostCardProps {
   post: Post

@@ -8,9 +8,9 @@ import { PostsFeed } from "@/components/posts/posts-feed"
 import { DiscoverPage } from "@/components/social/discover-page"
 import { Button } from "@/components/ui/button"
 import { User, Home, LogOut, Compass } from "lucide-react"
+import { FILE_URL } from "./file"
 
 type View = "home" | "profile" | "discover"
-export const FILE_URL = process.env.API_URL || "https://social-media-gab1.onrender.com"
 
 export default function HomePage() {
   const { user, logout, isLoading } = useAuth()

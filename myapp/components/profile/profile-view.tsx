@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { User, Edit, Users, UserPlus } from "lucide-react";
 import type { User as UserType } from "@/contexts/auth-context";
-import { FILE_URL } from "@/app/page";
+import { FILE_URL } from "@/app/file";
 
 interface ProfileViewProps {
   user: UserType;

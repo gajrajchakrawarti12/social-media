@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { useAuth } from "@/contexts/auth-context"
 import { usePosts } from "@/contexts/posts-context"
 import { Send, ImageIcon, X } from "lucide-react"
-import { FILE_URL } from "@/app/page"
+import { FILE_URL } from "@/app/file"
 
 export function CreatePostForm() {
   const { user } = useAuth()

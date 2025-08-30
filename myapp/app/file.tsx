@@ -1,0 +1,1 @@
+export const FILE_URL = process.env.API_URL || "https://social-media-gab1.onrender.com"

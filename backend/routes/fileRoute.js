@@ -4,7 +4,7 @@ import FileBlob from '../models/FileBlob.js';
 const router = express.Router();
 router.get("/:id", async(req, res) => {
   res.set({
-    "Access-Control-Allow-Origin": "http://localhost:3000",
+    "Access-Control-Allow-Origin": "https://smediaone.netlify.app",
     "Access-Control-Allow-Credentials": "true",
     "Cache-Control": "no-store" // prevent 304 cache issues
   });

@@ -13,7 +13,7 @@ interface SocialContextType {
   isLoading: boolean
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://social-media-gab1.onrender.com/api"
 
 const SocialContext = createContext<SocialContextType | undefined>(undefined)
 

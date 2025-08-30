@@ -46,7 +46,7 @@ export function PostsProvider({ children }: { children: React.ReactNode }) {
   const [posts, setPosts] = useState<Post[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [user, setUser] = useState<User | null>(null)
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://social-media-gab1.onrender.com/api"
 
   useEffect(() => {
     // Load posts from API on mount

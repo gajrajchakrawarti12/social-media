@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { useAuth } from "@/contexts/auth-context"
 import { usePosts } from "@/contexts/posts-context"
 import { Send, ImageIcon, X } from "lucide-react"
+import { FILE_URL } from "@/app/page"
 
 export function CreatePostForm() {
   const { user } = useAuth()
@@ -43,7 +44,7 @@ export function CreatePostForm() {
     <Card className="w-full">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-3">
-          <img src={user.avatar ? `${process.env.API_URL}/files/${user.avatar}` : "/placeholder-user.jpg"} alt={user.username} className="w-8 h-8 rounded-full" crossOrigin="anonymous" />
+          <img src={user.avatar ? `${FILE_URL}/files/${user.avatar}` : "/placeholder-user.jpg"} alt={user.username} className="w-8 h-8 rounded-full" crossOrigin="anonymous" />
           <div>
             <p className="font-medium">@{user.username}</p>
             <p className="text-sm text-muted-foreground">Share your thoughts...</p>

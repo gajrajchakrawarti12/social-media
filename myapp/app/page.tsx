@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { User, Home, LogOut, Compass } from "lucide-react"
 
 type View = "home" | "profile" | "discover"
+export const FILE_URL = process.env.API_URL || "https://social-media-gab1.onrender.com"
 
 export default function HomePage() {
   const { user, logout, isLoading } = useAuth()
@@ -65,7 +66,7 @@ export default function HomePage() {
 
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <img src={user.avatar ? `${process.env.API_URL ? process.env.API_URL : ""}/files/${user.avatar}` : "/placeholder-user.jpg"} alt={user.username} className="w-8 h-8 rounded-full" crossOrigin="anonymous" />
+              <img src={user.avatar ? `${FILE_URL}/files/${user.avatar}` : "/placeholder-user.jpg"} alt={user.username} className="w-8 h-8 rounded-full" crossOrigin="anonymous" />
               <span className="font-medium">@{user.username}</span>
             </div>
             <Button variant="outline" size="sm" onClick={logout}>

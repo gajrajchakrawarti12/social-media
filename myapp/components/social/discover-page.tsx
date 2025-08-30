@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useSocial } from "@/contexts/social-context"
 import { UserPlus, UserMinus, Users, TrendingUp } from "lucide-react"
+import { FILE_URL } from "@/app/page"
 
 export function DiscoverPage() {
   const { users, followUser, unfollowUser } = useSocial()
@@ -29,7 +30,7 @@ export function DiscoverPage() {
           <Card key={userProfile._id} className="hover:shadow-lg transition-shadow">
             <CardHeader className="text-center pb-4">
               <img
-                src={userProfile.avatar ? `${process.env.API_URL}/files/${userProfile.avatar}` : "/placeholder.svg"}
+                src={userProfile.avatar ? `${FILE_URL}/files/${userProfile.avatar}` : "/placeholder.svg"}
                 alt={userProfile.username}
                 className="w-16 h-16 rounded-full mx-auto mb-3"
                 crossOrigin="anonymous"

@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/contexts/auth-context"
 import { Save, X } from "lucide-react"
+import { FILE_URL } from "@/app/page"
 
 interface EditProfileFormProps {
   onCancel: () => void
@@ -109,7 +110,7 @@ export function EditProfileForm({ onCancel, onSave }: EditProfileFormProps) {
           {/* Avatar Preview */}
           <div className="text-center">
             <img
-              src={user?.avatar ? `${process.env.API_URL}/files/${user?.avatar}` : `/placeholder.svg?height=120&width=120&query=user avatar`}
+              src={user?.avatar ? `${FILE_URL}/files/${user?.avatar}` : `/placeholder.svg?height=120&width=120&query=user avatar`}
               alt="Profile preview"
               className="w-24 h-24 rounded-full mx-auto border-4 border-primary/20 object-cover"
             />

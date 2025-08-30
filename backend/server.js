@@ -28,7 +28,7 @@ app.use(cookieParser());
 app.use(morgan('dev'));
 app.use(helmet());
 app.use(cors({
-  origin: process.env.CLIENT_URL,
+  origin: [process.env.CLIENT_URL, "http://localhost:3000"],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true,
 }));

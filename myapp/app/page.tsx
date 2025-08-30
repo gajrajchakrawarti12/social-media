@@ -65,7 +65,7 @@ export default function HomePage() {
 
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <img src={user.avatar ? `${process.env.API_URL}/files/${user.avatar}` : "/placeholder-user.jpg"} alt={user.username} className="w-8 h-8 rounded-full" crossOrigin="anonymous" />
+              <img src={user.avatar ? `${process.env.API_URL ? process.env.API_URL : ""}/files/${user.avatar}` : "/placeholder-user.jpg"} alt={user.username} className="w-8 h-8 rounded-full" crossOrigin="anonymous" />
               <span className="font-medium">@{user.username}</span>
             </div>
             <Button variant="outline" size="sm" onClick={logout}>

@@ -26,6 +26,7 @@ router.get('/', async(req, res) => {
                             as: "p",
                             in: {
                                 content: "$$p.content",
+                                hashtags: "$$p.hashtags",
                                 likes: "$$p.likes",
                                 comment: "$$p.comments",
                                 createdAt: "$$p.createdAt"

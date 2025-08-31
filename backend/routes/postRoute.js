@@ -19,29 +19,36 @@ const upload = multer({
 });
 
 
-router.post('/', upload.single('image'), async (req, res) => {
+router.post('/', verifyToken, upload.single('image'), async (req, res) => {
   try {
-    console.log(req.body, req.file);
-    const file = req.file;
-    if (!file) {
-      const post = new Post({ ...req.body, image: null });
-      await post.save();
-      return res.status(400).json({ message: 'No image file uploaded' });
+    const file = req.file; // undefined if no file uploaded
+
+    let imageId = null;
+    if (file) {
+      const fileBlob = new FileBlob({
+        filename: file.originalname,
+        mimetype: file.mimetype,
+        size: file.size,
+        data: file.buffer,
+      });
+      await fileBlob.save();
+      imageId = fileBlob._id;
     }
-    const fileBlob = new FileBlob({
-      filename: file.originalname,
-      mimetype: file.mimetype,
-      size: file.size,
-      data: file.buffer,
+
+    const post = new Post({
+      ...req.body,
+      userId: req.user._id,
+      image: imageId
     });
-    await fileBlob.save();
-    const post = new Post({ ...req.body, image: fileBlob._id });
+
     await post.save();
     res.status(201).json(post);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.error(error);
+    res.status(500).json({ error: error.message });
   }
 });
+
 
 router.get('/', async (req, res) => {
   try {

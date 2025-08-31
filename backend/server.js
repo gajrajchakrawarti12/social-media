@@ -13,6 +13,7 @@ import { fileURLToPath } from 'url';
 import connectDB from './config/db.js';
 import verifyAccessToken from './middleware/authentication.js';
 import fileRoute from './routes/fileRoute.js';
+import shareRoute from './routes/shareRoute.js'
 
 const app = express();
 
@@ -39,6 +40,8 @@ app.use(rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: 1000, // limit each IP to 1000 requests per windowMs
 }));
+
+app.use('/share', shareRoute)
 
 app.use('/files', fileRoute);
 
